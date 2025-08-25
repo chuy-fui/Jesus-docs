@@ -1,4 +1,4 @@
-site_name: Plantilla para Documentación
+site_name: Documentación
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
@@ -26,10 +26,19 @@ markdown_extensions:
 # Use the ReadTheDocs theme
 theme:
   name: material
-  highlightjs: true 
   palette:
-      - scheme: default
-        primary: red
+    - scheme: default
+      primary: black
+      accent: purple
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Modo oscuro
+    - scheme: slate
+      primary: grey
+      accent: purple
+      toggle:
+        icon: material/toggle-switch
+        name: Modo claro
 
   features:
     - content.code.copy
