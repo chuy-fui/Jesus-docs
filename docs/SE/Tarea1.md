@@ -4,14 +4,14 @@
 ### Sistema de reconocimiento de voz básico
 El proyecto consiste en implementar un sistema embebido capaz de reconocer comandos de voz simples, ejemplo: “encender”, “apagar”, “subir”, “bajar”, y ejecutar acciones predefinidas como activar un LED, encender un ventilador, abrir una puerta o controlar dispositivos del hogar.
 
-## **Elecciones**
+## **Microcontroladores**
 Para elegir los microcontroladores más adecuados para un proyecto de reconocimiento de voz, se priorizó que tuvieran capacidad de procesar audio de una mejor manera, así como memoria suficiente para ejecutar modelos de reconocimiento de voz de manera eficiente. Lo que facilita el desarrollo y permite implementar funcionalidades de forma más rápida y confiable.
 
 Microcontroladores escogidos:
 
+- **nRF52840**
 - **ESP32**
 - **STM32F407**
-- **nRF52840**
 - **RP2040**
 
 ### **Tabla comparativa**
@@ -30,10 +30,19 @@ Microcontroladores escogidos:
 - **Ecosistema:** El ecosistema se refiere al conjunto de elementos y componentes necesarios para su funcionamiento y desarrollo, que van desde el hardware hasta el software y las herramientas de programación.
 
 ## **Comparativa**
-El ESP32 sobresale como una de las mejores opciones debido a su equilibrio entre potencia, conectividad y costo. Incorpora Wi-Fi y Bluetooth, y cuenta con librerías específicas para reconocimiento de voz como ESP-SR, además de compatibilidad con TensorFlow Lite Micro. Esto permite un desarrollo rápido y con gran respaldo de la comunidad. El STM32F407, por su parte, ofrece mayor robustez en el procesamiento digital de señales gracias a su unidad de punto flotante (FPU) y un ecosistema profesional, aunque carece de conectividad inalámbrica integrada y presenta un costo más alto.
+El ESP32 sobresale como una de las mejores opciones debido a su equilibrio entre potencia, conectividad y costo. Incorpora Wi-Fi y Bluetooth, y cuenta con librerías específicas para reconocimiento de voz. Esto permite un desarrollo rápido y con gran respaldo de la comunidad. El STM32F407, por su parte, ofrece mayor robustez en el procesamiento digital de señales, aunque carece de conectividad inalámbrica integrada y presenta un costo más alto.
 
 El nRF52840 resulta atractivo para aplicaciones portátiles o de bajo consumo, ya que integra Bluetooth Low Energy y dispone de suficiente memoria para modelos pequeños de reconocimiento de voz. Sin embargo, su frecuencia de trabajo más baja limita su rendimiento en tiempo real. En contraste, el RP2040 destaca por su bajo precio y amplia comunidad maker, lo que lo hace ideal para prototipado y proyectos educativos, aunque no es el más indicado para aplicaciones de voz intensivas debido a su memoria reducida y falta de conectividad integrada.
 
+### Ranking
+1. ESP32 
+
+2. STM32F407 ​
+
+3. nRF52840 ​
+
+4. RP2040 ​
 ## **Conclusión**
 El ESP32 es la alternativa más conveniente para este proyecto, pues combina conectividad, soporte específico para reconocimiento de voz y facilidad de implementación. El STM32F407 es recomendable si se busca un mayor control y precisión en el procesamiento de audio, mientras que el nRF52840 es idóneo para aplicaciones portátiles de bajo consumo, y el RP2040 queda como una opción económica para pruebas o entornos de aprendizaje.
+
 
