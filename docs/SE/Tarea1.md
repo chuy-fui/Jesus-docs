@@ -11,6 +11,7 @@ El proyecto consiste en implementar un sistema embebido capaz de reconocer coman
 Para elegir los microcontroladores más adecuados para un proyecto de reconocimiento de voz, se priorizó que tuvieran capacidad de procesar audio de una mejor manera, así como memoria suficiente para ejecutar modelos de reconocimiento de voz de manera eficiente. Lo que facilita el desarrollo y permite implementar funcionalidades de forma más rápida y confiable.
 
 **Microcontroladores escogidos:**
+
 - nRF52840
 - ESP32
 - STM32F407
@@ -58,6 +59,6 @@ En contraste, el **RP2040** destaca por su bajo precio y amplia comunidad maker,
 ---
 
 ## Conclusión
-El **ESP32** es la alternativa más conveniente para este proyecto, pues combina conectividad, soporte específico para reconocimiento de voz y facilidad de implementación.  
+El ESP32 es la alternativa más conveniente para este proyecto, pues combina conectividad, soporte específico para reconocimiento de voz y facilidad de implementación.  
 
-El **STM32F407** es recomendable si se busca un mayor control y precisión en el procesamiento de audio, mientras que el **nRF52840** es idóneo para aplicaciones portátiles de bajo consumo, y el **RP2040** queda como una opción económica para pruebas o entornos de aprendizaje.
+El STM32F407 es recomendable si se busca un mayor control y precisión en el procesamiento de audio, mientras que el nRF5284 es idóneo para aplicaciones portátiles de bajo consumo, y el RP2040 queda como una opción económica para pruebas o entornos de aprendizaje.
