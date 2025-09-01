@@ -30,7 +30,7 @@ int main() {
 }
 ```
 ## Esquemtico
-![Diagrama del sistema](recursos/Image.png)
+![Diagrama del sistema](recursos/esquematico.png)
  
  
 ## Video
@@ -86,7 +86,7 @@ int main() {
 }
 ```
 ## Esquemtico
-![Diagrama del sistema](recursos/Image.png)
+![Diagrama del sistema](recursos/esquematico.png)
  
  
 ## Video
