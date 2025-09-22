@@ -178,7 +178,7 @@ En ambos casos se mantuvo idéntico el resto del código.
 ![Diagrama del sistema](recursos/osc_ms.jpeg)
  
 ## Esquema modo ciclos
-![Diagrama del sistema](recursos/osc_ciclos.jpeg)
+![Diagrama del sistema](recursos/osc_ciclo.jpeg)
  
 ### Resultado de medición con osciloscopio
  
@@ -315,5 +315,4 @@ int main() {
  
 ## Video
 <iframe width="560" height="315" src="https://www.youtube.com/embed/mF6rjDa452A?si=MJhPKmeo25mgGrqz" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> 
-YouTube
  
