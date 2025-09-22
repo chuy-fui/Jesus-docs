@@ -28,8 +28,8 @@ Construir un juego Simón Dice de 4 colores en Raspberry Pi Pico 2.
 
 6. *Fin:* al fallar o completar la Ronda 15. Mostrar puntaje final en 7 segmentos (hex).
 
-C++ 
 
+``` C++ 
 #include "pico/stdlib.h"
 #include "hardware/structs/sio.h"
 #include "pico/time.h"
@@ -235,7 +235,7 @@ Reiniciar:
 
     return 0;
 }
-
+```
 
 
 
