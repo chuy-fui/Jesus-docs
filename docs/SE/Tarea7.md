@@ -128,7 +128,7 @@ int esperar_boton(int tiempo){
 
     while(1){
 
-        int64_t tiempo_us = absolute_time_diff_us(inicio, get_absolute_time());
+        int64_t   = absolute_time_diff_us(inicio, get_absolute_time());
         if(tiempo_us >= (int64_t)tiempo*1000) return -1; // Timeout
 
         int b = boton_flanco();
