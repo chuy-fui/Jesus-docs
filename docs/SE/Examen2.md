@@ -112,59 +112,63 @@ El movimiento de un servo requiere:
 #include "hardware/pwm.h"
 #include <stdio.h>
 #include <string>
-
+ 
 using namespace std;
-
-
+ 
 #define SERVO_PIN 0
-#define SERVO_MIN_US 1000
-#define SERVO_MAX_US 2000
-#define PWM_FREQ_HZ 50
-
-#define BTN_MODE 1
-#define BTN_NEXT 3
-#define BTN_PREV 2
-
+#define SERVO_MIN 1000
+#define SERVO_MAX 2000
+#define FREC 50
+ 
+#define B_MODE 1
+#define B_NEXT 3
+#define B_PREV 2
+ 
 #define MAX_POS 10
-
-
+ 
 string mensaje = "";
 int posiciones[MAX_POS];
 int total_pos = 0;
 int modo = 0;
 int pos_actual = 0;
 uint32_t ultimo_continuo = 0;
-
-//Función para mover el servo
+ 
+// Función para mover el servo
 void mover_servo(int angulo) {
     if (angulo < 0) angulo = 0;
     if (angulo > 180) angulo = 180;
-
-    float pulso_us = SERVO_MIN_US + (angulo / 180.0f) * (SERVO_MAX_US - SERVO_MIN_US);
-    float periodo_us = 1000000.0f / PWM_FREQ_HZ;
-    uint16_t duty = (uint16_t)((pulso_us / periodo_us) * 65535);
+ 
+    float pulso = SERVO_MIN + (angulo / 180.0f) * (SERVO_MAX - SERVO_MIN);
+    float periodo = 1000000.0f / FREC;
+    uint16_t duty = (uint16_t)((pulso / periodo) * 65535);
     pwm_set_gpio_level(SERVO_PIN, duty);
 }
-
+ 
 int main() {
     stdio_init_all();
-
-    //Configurar PWM
+ 
+    // Configurar PWM
     gpio_set_function(SERVO_PIN, GPIO_FUNC_PWM);
     uint slice = pwm_gpio_to_slice_num(SERVO_PIN);
     pwm_set_wrap(slice, 65535);
-    pwm_set_clkdiv(slice, 125000000.0f / (PWM_FREQ_HZ * 65536));
+    pwm_set_clkdiv(slice, 125000000.0f / (FREC * 65536));
     pwm_set_enabled(slice, true);
-
-    //Configurar botones
-    gpio_init(BTN_MODE); gpio_set_dir(BTN_MODE, GPIO_IN); gpio_pull_up(BTN_MODE);
-    gpio_init(BTN_NEXT); gpio_set_dir(BTN_NEXT, GPIO_IN); gpio_pull_up(BTN_NEXT);
-    gpio_init(BTN_PREV); gpio_set_dir(BTN_PREV, GPIO_IN); gpio_pull_up(BTN_PREV);
-
-
+ 
+    gpio_init(B_MODE);
+    gpio_set_dir(B_MODE, GPIO_IN);
+    gpio_pull_up(B_MODE);
+ 
+    gpio_init(B_NEXT);
+    gpio_set_dir(B_NEXT, GPIO_IN);
+    gpio_pull_up(B_NEXT);
+ 
+    gpio_init(B_PREV);
+    gpio_set_dir(B_PREV, GPIO_IN);
+    gpio_pull_up(B_PREV);
+ 
     while (true) {
-        //Cambio de modo
-        if (!gpio_get(BTN_MODE)) {
+        // Cambio de modo
+        if (!gpio_get(B_MODE)) {
             modo = (modo + 1) % 3;
             pos_actual = 0;
             if (modo == 0) printf("Modo Entrenamiento\n");
@@ -172,26 +176,26 @@ int main() {
             else printf("Modo Step\n");
             sleep_ms(300);
         }
-
-        //Entrenamiento
+ 
+        // Modo Entrenamiento
         if (modo == 0) {
             int ch = getchar_timeout_us(10000);
             if (ch != PICO_ERROR_TIMEOUT) {
                 char c = (char)ch;
                 if (c == '\r' || c == '\n') continue;
                 mensaje += c;
-
+ 
                 if (c == ';') {
                     string comando = mensaje.substr(0, mensaje.length() - 1);
                     string cmd_lower = comando;
                     for (auto &ch : cmd_lower) ch = tolower(ch);
-
-                    //Comando clear/borrar
+ 
+                    // Comando clear/borrar
                     if (cmd_lower == "clear" || cmd_lower == "borrar") {
                         total_pos = 0;
                         printf("OK\n");
                     }
-                    //Comando write/escribir
+                    // Comando write/escribir
                     else if (cmd_lower.substr(0,5) == "write" || cmd_lower.substr(0,7) == "escribir") {
                         int inicio = comando.find(',') + 1;
                         bool error = false;
@@ -211,7 +215,7 @@ int main() {
                             printf("\n");
                         }
                     }
-                    //Comando replace/reemplazar
+                    // Comando replace/reemplazar
                     else if (cmd_lower.substr(0,7) == "replace" || cmd_lower.substr(0,9) == "reemplazar") {
                         int pos1 = comando.find(',') + 1;
                         int pos2 = comando.find(',', pos1);
@@ -227,13 +231,13 @@ int main() {
                         } else printf("Error argumento invalido\n");
                     }
                     else printf("Código no reconocido\n");
-
+ 
                     mensaje = "";
                 }
             }
         }
-
-        //Continuo
+ 
+        // Modo Continuo
         if (modo == 1) {
             uint32_t now = to_ms_since_boot(get_absolute_time());
             if (now - ultimo_continuo >= 1500) {
@@ -246,10 +250,10 @@ int main() {
                 ultimo_continuo = now;
             }
         }
-
-        //Step
+ 
+        // Modo Step
         if (modo == 2) {
-            if (!gpio_get(BTN_NEXT)) {
+            if (!gpio_get(B_NEXT)) {
                 if (total_pos == 0) printf("Error no hay pos\n");
                 else if (pos_actual < total_pos - 1) pos_actual++;
                 if (total_pos > 0) {
@@ -258,7 +262,7 @@ int main() {
                 }
                 sleep_ms(200);
             }
-            if (!gpio_get(BTN_PREV)) {
+            if (!gpio_get(B_PREV)) {
                 if (total_pos == 0) printf("Error no hay pos\n");
                 else if (pos_actual > 0) pos_actual--;
                 if (total_pos > 0) {
@@ -268,7 +272,7 @@ int main() {
                 sleep_ms(200);
             }
         }
-
+ 
         sleep_ms(10);
     }
 }
