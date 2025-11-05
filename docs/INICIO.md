@@ -1,5 +1,5 @@
 # INICIO
-# Bienvenido a mi página de proyectos de Mecatrónica
+# Este es una pagina en donde se encuentran mis proyectos de la universidad
 
 
 <div class="gears" style="display:flex; justify-content:center; align-items:center; margin:40px 0;">
@@ -12,7 +12,7 @@
 .gear {
   width: 80px;
   height: 80px;
-  border: 10px solid #555;
+  border: 10px sol id #555;
   border-radius: 50%;
   position: relative;
   animation: girar 6s linear infinite;
