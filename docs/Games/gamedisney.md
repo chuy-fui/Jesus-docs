@@ -44,15 +44,15 @@ const questions = [
     type: "lyricChoice",
     question: "🎶 From which movie is this song?",
     lyric: "\"Hakuna Matata\"",
-    options: ["Finding Nemo", "The Lion King", "Tarzan", "Coco"],
-    correct: 1
+    options: ["Finding Nemo", "Tarzan", "Coco", "The Lion King"],
+    correct: 3
   },
   {
     type: "lyricChoice",
     question: "🎶 From which movie is this song?",
     lyric: "\"Under the sea\"",
-    options: ["The Little Mermaid", "Frozen", "Moana", "Luca"],
-    correct: 0
+    options: [ "Frozen", "Moana","The Little Mermaid", "Luca"],
+    correct: 2
   },
   {
     type: "lyricChoice",
