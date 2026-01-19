@@ -6,7 +6,7 @@ El proyecto Micromouse consiste en diseñar y programar un robot móvil autónom
 
 ## Código
 
-C++
+``` C++
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -496,7 +496,7 @@ int main() {
     }
     return 0;
 }
-
+```
 
 ## Esquema
 ![Diagrama del sistema](images/esquema_raton.png)
