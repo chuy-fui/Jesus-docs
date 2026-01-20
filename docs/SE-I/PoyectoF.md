@@ -6,7 +6,11 @@ El proyecto Micromouse consiste en diseñar y programar un robot móvil autónom
 
 ## Código
 
+<<<<<<< HEAD:docs/SE-I/PoyectoF.md
 ``` C++
+=======
+```C++
+>>>>>>> fedacefabee558440d8907fdb79d5c676bc8f2ee:docs/SE/PoyectoF.md
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
