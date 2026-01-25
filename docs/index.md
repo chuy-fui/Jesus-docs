@@ -1,7 +1,6 @@
 # INICIO
 # Este es una pagina en donde se encuentran mis proyectos de la universidad
 
-
 <div class="gears" style="display:flex; justify-content:center; align-items:center; margin:40px 0;">
   <div class="gear" style="--i:1;"></div>
   <div class="gear" style="--i:-1; margin-left:-20px;"></div>
