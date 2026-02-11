@@ -16,7 +16,6 @@ Create multiple FreeRTOS tasks in ESP-IDF.
 ## 2.1 Lab 1 — Two tasks, delays, priorities
 
 ``` c
-#include 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/gpio.h"
@@ -137,3 +136,224 @@ vTaskDelay(pdMS_TO_TICKS(300));
 6. What pattern is happening now (buffering / backlog)?
 We started losing data, this is because data is being generated and transmitted quicker than we can receive it.
 
+## 2.3 Lab 3 — Mutex: protect a shared resource
+
+```c
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
+#include "esp_log.h"
+
+static const char *TAG = "LAB3B";
+
+static volatile int shared_counter = 0;
+static SemaphoreHandle_t counter_mutex;
+
+static void increment_task(void *pvParameters)
+{
+    const char *name = (const char *)pvParameters;
+
+    while (1) {
+        xSemaphoreTake(counter_mutex, portMAX_DELAY);
+
+        int local = shared_counter;
+        local++;
+        shared_counter = local;
+
+        xSemaphoreGive(counter_mutex);
+
+        if ((shared_counter % 1000) == 0) {
+            ESP_LOGI(TAG, "%s sees counter=%d", name, shared_counter);
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(1));
+    }
+}
+
+void app_main(void)
+{
+    ESP_LOGI(TAG, "Starting Lab 3B (mutex fix)");
+
+    counter_mutex = xSemaphoreCreateMutex();
+    if (counter_mutex == NULL) {
+        ESP_LOGE(TAG, "Mutex create failed");
+        return;
+    }
+
+    xTaskCreate(increment_task, "incA", 2048, "TaskA", 6, NULL);
+    xTaskCreate(increment_task, "incB", 2048, "TaskB", 4, NULL);
+}
+```
+
+1. Remove the mutex again. Do you ever see weird behavior?
+Task A runs constantly without allowing Task B to run.
+2. Change priorities: TaskA priority 6, TaskB priority 4.
+3. What do you expect and why?
+No changes, the system is stable. This is because even with the higher priority allows each task to run only one before allowing the other task to run.
+4. In one sentence: what does a mutex “guarantee”?
+A mutex guarantees that only one task at a time can access a shared resource, preventing data corruption.
+
+## 2.4 Lab 3 — Task exercise
+
+Create the 7 task code
+
+Task 1 Heartbeat
+Task 2 Alive task
+Task 3 Queue Struct Send
+Task 4 Queue Struct Receive
+Task 5 and 6 Mutex reading a button
+Task 7 Error loggin for task 1-6
+
+```c
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/gpio.h"
+#include "esp_log.h"
+
+#define LED_GPIO GPIO_NUM_2
+#define BUTTON1_GPIO GPIO_NUM_3
+#define BUTTON2_GPIO GPIO_NUM_15
+
+static const char *TAG = "LAB3B";
+
+static volatile int shared_counter = 0;
+static volatile int button_shared_counter = 0;
+
+static volatile int x0 = 0;
+static volatile int x1 = 0;
+static volatile int x2 = 0;
+static volatile int x3 = 0;
+static volatile int x4 = 0;
+static volatile int x5 = 0;
+static volatile int x6 = 1;
+
+static SemaphoreHandle_t counter_mutex;
+static SemaphoreHandle_t button_mutex; 
+static QueueHandle_t q_messages;
+
+typedef struct{
+    int id;
+    int value;
+} Message_t;
+
+static void increment_task(void *pvParameters)
+{
+    const char *name = (const char *)pvParameters;
+    while (1) {
+        xSemaphoreTake(counter_mutex, portMAX_DELAY);
+        shared_counter++;
+        ESP_LOGI(TAG, "%s sees counter=%d", name, shared_counter);
+        xSemaphoreGive(counter_mutex);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
+static void heartbeat_task(void *pvParameters)
+{
+    gpio_reset_pin(LED_GPIO);
+    gpio_set_direction(LED_GPIO, GPIO_MODE_OUTPUT);
+    while (1) {
+        gpio_set_level(LED_GPIO, 1);
+        vTaskDelay(pdMS_TO_TICKS(300));
+        gpio_set_level(LED_GPIO, 0);
+        vTaskDelay(pdMS_TO_TICKS(300));
+    }
+}
+
+static void alive_task(void *pvParameters)
+{
+    while (1) {
+        ESP_LOGI(TAG, "alive");
+        vTaskDelay(pdMS_TO_TICKS(2000));
+    }
+}
+
+static void sender_task(void *pvParameters)
+{
+    Message_t msg;
+    msg.id = 1;
+    while (1) {
+        xSemaphoreTake(counter_mutex, portMAX_DELAY);
+        msg.value = shared_counter;
+        xSemaphoreGive(counter_mutex);
+        xQueueSend(q_messages, &msg, portMAX_DELAY);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
+static void receiver_task(void *pvParameters)
+{
+    Message_t rx;
+    while (1) {
+        if (xQueueReceive(q_messages, &rx, portMAX_DELAY) == pdPASS) {
+            ESP_LOGI(TAG, "Queue rx: id=%d value=%d", rx.id, rx.value);
+        }
+    }
+}
+
+static void readbutton1_task(void *pvParameters)
+{
+    gpio_reset_pin(BUTTON1_GPIO);
+    gpio_set_direction(BUTTON1_GPIO, GPIO_MODE_INPUT);
+    while (1) {
+        if (gpio_get_level(BUTTON1_GPIO) == 0) {
+            xSemaphoreTake(button_mutex, portMAX_DELAY);
+            button_shared_counter++;
+            ESP_LOGI(TAG, "Button 1 pressed. Shared: %d", button_shared_counter);
+            xSemaphoreGive(button_mutex);
+        }
+        vTaskDelay(pdMS_TO_TICKS(200)); 
+    }
+}
+
+static void readbutton2_task(void *pvParameters)
+{
+    gpio_reset_pin(BUTTON2_GPIO);
+    gpio_set_direction(BUTTON2_GPIO, GPIO_MODE_INPUT);
+    while (1) {
+        if (gpio_get_level(BUTTON2_GPIO) == 0) { 
+            xSemaphoreTake(button_mutex, portMAX_DELAY);
+            button_shared_counter++;
+            ESP_LOGI(TAG, "Button 2 pressed. Shared: %d", button_shared_counter);
+            xSemaphoreGive(button_mutex);
+        }
+        vTaskDelay(pdMS_TO_TICKS(50));
+    }
+}
+
+static void monitor_task(void *pvParameters)
+{
+    while (1) {
+        if (x0 != 0) ESP_LOGE(TAG, "Error log: Increment Task A failure detected");
+        if (x1 != 0) ESP_LOGE(TAG, "Error log: Increment Task B failure detected");
+        if (x2 != 0) ESP_LOGE(TAG, "Error log: Heartbeat Task failure detected");
+        if (x3 != 0) ESP_LOGE(TAG, "Error log: Alive Task failure detected");
+        if (x4 != 0) ESP_LOGE(TAG, "Error log: Sender Task failure detected");
+        if (x5 != 0) ESP_LOGE(TAG, "Error log: Receiver Task failure detected");
+        if (x6 != 0) ESP_LOGE(TAG, "Error log: Button Task failure detected");
+
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
+void app_main(void)
+{
+    counter_mutex = xSemaphoreCreateMutex();
+    button_mutex = xSemaphoreCreateMutex(); 
+
+    if (counter_mutex == NULL || button_mutex == NULL) return;
+
+    q_messages = xQueueCreate(10, sizeof(Message_t));
+
+    xTaskCreate(increment_task, "incA", 2048, "TaskA", 6, NULL);
+    xTaskCreate(increment_task, "incB", 2048, "TaskB", 4, NULL);
+    xTaskCreate(heartbeat_task, "heartbeat", 2048, NULL, 5, NULL);
+    xTaskCreate(alive_task, "alive", 2048, NULL, 0, NULL);
+    xTaskCreate(sender_task, "sender", 2048, NULL, 1, NULL);
+    xTaskCreate(receiver_task, "receiver", 2048, NULL, 2, NULL);
+    xTaskCreate(readbutton1_task, "btn1", 2048, NULL, 0, NULL);
+    xTaskCreate(readbutton2_task, "btn2", 2048, NULL, 0, NULL);
+    xTaskCreate(monitor_task, "monitor", 2048, NULL, 1, NULL);
+}
+```
